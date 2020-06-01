@@ -1,3 +1,9 @@
+""" 
+
+quick count on number of reviews scraped so far.
+
+"""
+
 import os, glob
 import subprocess
 
