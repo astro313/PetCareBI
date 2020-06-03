@@ -43,7 +43,9 @@ def check_number_of_nans(fname):
 
 
 if __name__ == '__main__':
-    review_files = glob.glob('scraped_data/*_2020*.csv')
+    # review_files = glob.glob('scraped_data/*_2020*.csv')
+#    review_files = glob.glob('scraped_data_nodupl_biz/9*.csv')
+#    review_files = glob.glob('scraped_data_nodupl_biz/1*.csv')
 
     x = 0
     weird_review_file = []
