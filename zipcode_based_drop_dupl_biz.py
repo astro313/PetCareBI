@@ -24,7 +24,7 @@ def remove_dupl_biz(cities, out_path, columns, catnum=5):
             # check if already done
             if not os.path.isfile(out_path + zipc + '_reviews.csv'):
                 for num in range(num_df_to_create):
-                    df = pd.read_csv(fff[num], names=columns)
+                    df = pd.read_csv(fff[num], header=0, names=columns)
                     if num == 0:
                         df_all = df
                     else:
@@ -32,16 +32,16 @@ def remove_dupl_biz(cities, out_path, columns, catnum=5):
 
                 # drop the duplicated business and then save as one .csv file zipcode
                 before_len = len(df_all)
-                unique_biz = df_all.biz_name.nunique()
-                df_all = df_all[~df_all.biz_name.duplicated()]
-                assert len(df_all) == unique_biz
-                print("from {} total rows to {} rows for all biz in this zipcode.".format(before_len, unique_biz))
+                # print(df_all.duplicated(subset=['biz_name', 'review_text']).sum())
+                df_all.drop_duplicates(subset=['biz_name', 'review_text'], keep='first', inplace=True)
+                print("from {} total rows to {} rows for all biz in this zipcode.".format(before_len, len(df_all)))
                 df_all.to_csv(out_path + zipc + '_reviews.csv', \
                               index=False, index_label=False)
             else:
                 print("zipcode done: {}".format(zipc))
         else:
-            pass
+            print("to run scripts again to deal with: ",  zipc)
+            # import pdb; pdb.set_trace()
             # if not all categories extracted: pass now and we will run this script again to deal w/ those later
 
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     cities_csv_SF = list(map(int, zipcodes_SF))
 
     zipcodes_NYC = np.loadtxt('zip_code.txt', delimiter=',')
-    cities_csv_NY = list(map(int, zipcodes_SF))
+    cities_csv_NY = list(map(int, zipcodes_NYC))
 
     columns = [
         'Ind', 'review_name', 'review_rating', 'review_date', 'review_text',
