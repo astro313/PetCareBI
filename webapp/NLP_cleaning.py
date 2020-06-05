@@ -1,4 +1,4 @@
-# NLP
+2z# NLP
 import gensim
 from gensim import models
 from gensim.models import Word2Vec
@@ -49,11 +49,8 @@ def standardize_text(df, text_field):
     return df
 
 
-from contractions import CONTRACTION_MAP
-
-
 def expand_contractions(text, contraction_mapping=CONTRACTION_MAP):
-
+    from contractions import CONTRACTION_MAP
     contractions_pattern = re.compile('({})'.format('|'.join(contraction_mapping.keys())),
                                       flags=re.IGNORECASE | re.DOTALL)
 
