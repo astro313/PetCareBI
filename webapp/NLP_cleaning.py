@@ -1,15 +1,8 @@
-2z# NLP
-import gensim
-from gensim import models
-from gensim.models import Word2Vec
-from gensim import corpora
-
+# NLP
+from contractions import CONTRACTION_MAP
 import re
 import string
-import pandas as pd
 from collections import defaultdict
-import spacy
-from sklearn.manifold import TSNE
 from nltk.corpus import stopwords
 STOPWORDS = set(stopwords.words('english'))
 
@@ -50,7 +43,7 @@ def standardize_text(df, text_field):
 
 
 def expand_contractions(text, contraction_mapping=CONTRACTION_MAP):
-    from contractions import CONTRACTION_MAP
+
     contractions_pattern = re.compile('({})'.format('|'.join(contraction_mapping.keys())),
                                       flags=re.IGNORECASE | re.DOTALL)
 
