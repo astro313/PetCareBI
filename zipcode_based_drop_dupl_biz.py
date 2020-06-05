@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     out_path = 'scraped_data_nodupl_biz/'
 
-    remove_dupl_biz(cities_csv_NY, out_path, columns)
+    remove_dupl_biz(cities_csv_NY, out_path, columns, catnum=4)
     remove_dupl_biz(cities_csv_SF, out_path, columns)
 
 
