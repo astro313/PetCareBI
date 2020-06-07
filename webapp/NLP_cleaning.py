@@ -15,11 +15,6 @@ from spacy import displacy
 from collections import Counter
 
 
-def correct_spelling(text):
-    from textblob import TextBlob
-    return TextBlob(text).correct()
-
-
 def standardize_text(df, text_field):
     # followed by one or more non-whitespaces, for the domain name
     df[text_field] = df[text_field].str.replace(r"http\S+", "")
@@ -166,7 +161,6 @@ def remove_single_time_words(list_of_tokenized_texts):
 
 
 def apply_NLP_cleaning(df_new):
-    df_new['review_text'] = df_new['review_text'].map(lambda x: correct_spelling(x))
     df_new = standardize_text(df_new, 'review_text')
     df_new['review_text'] = df_new['review_text'].map(
         lambda x: expand_contractions(x))
@@ -183,7 +177,7 @@ def apply_NLP_cleaning(df_new):
     df_new['review_text_lem_cleaned_tokenized'] = df_new[
         'review_text_lem_cleaned'].apply(lambda x: tokenize(x.lower()))
     df_new['review_text_lem_cleaned_tokenized_nostop'] = df_new['review_text_lem_cleaned_tokenized'].apply(lambda x: remove_stopwords(x))
-    df_new['remove_customized_stopwords'] = df_new['remove_customized_stopwords'].apply(lambda x: remove_customized_stopwords(x))
+    df_new['review_text_lem_cleaned_tokenized_nostop'] = df_new['review_text_lem_cleaned_tokenized_nostop'].apply(lambda x: remove_customized_stopwords(x))
     df_new['review_text_lem_cleaned_tokenized_nostop'] = remove_single_time_words(df_new['review_text_lem_cleaned_tokenized_nostop'])
     return df_new
 
