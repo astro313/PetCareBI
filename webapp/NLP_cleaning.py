@@ -12,6 +12,11 @@ import en_core_web_sm
 nlp = en_core_web_sm.load(disable=['ner', 'parser'])
 
 
+def correct_spelling(text):
+    from textblob import TextBlob
+    return TextBlob(text).correct()
+
+
 def standardize_text(df, text_field):
     # followed by one or more non-whitespaces, for the domain name
     df[text_field] = df[text_field].str.replace(r"http\S+", "")
@@ -140,6 +145,7 @@ def remove_single_time_words(list_of_tokenized_texts):
 
 
 def apply_NLP_cleaning(df_new):
+    df_new = df_new['review_text'].map(lambda x: correct_spelling(x))
     df_new = standardize_text(df_new, 'review_text')
     df_new['review_text'] = df_new['review_text'].map(
         lambda x: expand_contractions(x))
