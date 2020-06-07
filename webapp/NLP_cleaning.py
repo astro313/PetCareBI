@@ -182,6 +182,23 @@ def apply_NLP_cleaning(df_new):
     return df_new
 
 
+def prep_lda_input(x):
+    """
+
+    If load in from existing .csv file (tokenized, cleaned) to generate corpus.
+
+    >>> tmp = df_new['review_text_lem_cleaned_tokenized_nostop'].apply(lambda x: prep_lda_input(x)).tolist()
+
+    dictionary = dictionary.corpora.Dictionary(tmp)
+    dictionary.filter_extremes(no_below=5, no_above=0.3, keep_n=1000a00)
+    corpus = [dictionary.doc2bow(text) for text in tmp]
+
+    """
+    x = x.strip('][').split(', ')
+    x = [xx.strip("''") for xx in x]
+    return x
+
+
 
 # function to plot most frequent terms
 def freq_words(x, terms=30):
