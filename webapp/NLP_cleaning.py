@@ -8,8 +8,11 @@ STOPWORDS = set(stopwords.words('english'))
 
 # use spaCy for lemmatization
 import en_core_web_sm
-# don't need, disable to speed up
-nlp = en_core_web_sm.load(disable=['ner', 'parser'])
+nlp = en_core_web_sm.load(disable=["ner", "parser"])
+
+import spacy
+from spacy import displacy
+from collections import Counter
 
 
 def correct_spelling(text):
@@ -98,7 +101,7 @@ def clean_text_2(text):
 
 def clean_text_3(text):
     """ Reomve Yelp"""
-    text = re.sub(r'yelp(?i)', ' ', text)
+    text = re.sub(r'yelp', ' ', text)
     text = re.sub(r"(mon|tues|wednes|thurs|fri|satur|sun)day", " ", text)
     return text
 
@@ -110,15 +113,20 @@ def remove_accented_chars(text):
     return text
 
 
-def lemmatizer(text, tags=['NOUN', 'ADJ', 'VERB', 'ADV']):
+def lemmatizer(text, tags=['NOUN']): # , 'ADJ', 'VERB', 'ADV']):
     """
-    Keep noun and adjectivess
+    Keep noun
     """
     sent = []
     doc = nlp(text)
     output = [
         token.lemma_ if token.lemma_ not in '-PRON-' else '' for token in doc if token.pos_ in tags]
     return " ".join(output)
+
+
+def display_NER(text):
+    doc = nlp(lemmatizer(text))
+    displacy.render(doc, jupyter=False, style='ent')
 
 
 def tokenize(text):
@@ -128,10 +136,23 @@ def tokenize(text):
 
 def remove_stopwords(tokenized_list):
     """
-    Done above when cleaning, but just to make sure
+    Done when standardizing, but to make sure and also include more stopwords
     """
     text = [word for word in tokenized_list if word not in STOPWORDS]
     return text
+
+
+def remove_customized_stopwords(tokenized_list):
+    import os
+    if not os.path.isfile("stopwords-en.json"):
+        os.system("wget https://raw.githubusercontent.com/stopwords-iso/stopwords-en/master/stopwords-en.json")
+
+    import json
+    with open('stopwords-en.json', encoding='utf-8') as fopen:
+        stopwords = json.load(fopen)
+    text = [word for word in tokenized_list if word not in stopwords]
+    return text
+
 
 # remove less freq words (only occured once ever)
 def remove_single_time_words(list_of_tokenized_texts):
@@ -156,10 +177,36 @@ def apply_NLP_cleaning(df_new):
         'review_text'].apply(lambda x: clean_text_3(x))
     df_new['review_text'] = df_new['review_text'].apply(
         lambda x: remove_accented_chars(x))
+
     df_new['review_text_lem_cleaned'] = df_new[
         'review_text'].apply(lambda x: lemmatizer(x))
     df_new['review_text_lem_cleaned_tokenized'] = df_new[
         'review_text_lem_cleaned'].apply(lambda x: tokenize(x.lower()))
     df_new['review_text_lem_cleaned_tokenized_nostop'] = df_new['review_text_lem_cleaned_tokenized'].apply(lambda x: remove_stopwords(x))
+    df_new['remove_customized_stopwords'] = df_new['remove_customized_stopwords'].apply(lambda x: remove_customized_stopwords(x))
     df_new['review_text_lem_cleaned_tokenized_nostop'] = remove_single_time_words(df_new['review_text_lem_cleaned_tokenized_nostop'])
     return df_new
+
+
+
+# function to plot most frequent terms
+def freq_words(x, terms=30):
+    """
+
+    x: df['review_text']
+    """
+
+    from nltk import FreqDist
+    all_words = ' '.join([text for text in x])
+    all_words = all_words.split()
+
+    fdist = FreqDist(all_words)
+    words_df = pd.DataFrame({'word':list(fdist.keys()), 'count':list(fdist.values())})
+
+    import seaborn as sns
+    # selecting top 20 most frequent words
+    d = words_df.nlargest(columns="count", n = terms)
+    plt.figure(figsize=(20,5))
+    ax = sns.barplot(data=d, x= "word", y = "count")
+    ax.set(ylabel = 'Count')
+    plt.show()
