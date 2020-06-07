@@ -166,7 +166,7 @@ def remove_single_time_words(list_of_tokenized_texts):
 
 
 def apply_NLP_cleaning(df_new):
-    df_new = df_new['review_text'].map(lambda x: correct_spelling(x))
+    df_new['review_text'] = df_new['review_text'].map(lambda x: correct_spelling(x))
     df_new = standardize_text(df_new, 'review_text')
     df_new['review_text'] = df_new['review_text'].map(
         lambda x: expand_contractions(x))
