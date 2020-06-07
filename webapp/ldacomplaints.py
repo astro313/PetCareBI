@@ -74,21 +74,21 @@ def lda_analysis(list_of_tokenized_text, num_topics=5):
                                        )
 
     # Visualize the topics
-    vis = pyLDAvis.gensim.prepare(lda_model, bow_corpus, dictionary)
-    pyLDAvis.display(vis)
+    # vis = pyLDAvis.gensim.prepare(lda_model, bow_corpus, dictionary)
+    # pyLDAvis.display(vis)
 
     # dom_topc, percent, review_texts
     df_topic_sents_keywords = format_topics_sentences(
         ldamodel=lda_model, corpus=bow_corpus, texts=list_of_tokenized_text)
 
-    # df_dominant_topic = df_topic_sents_keywords.reset_index()
-    # df_dominant_topic.columns = [
-    #     "Document_No",
-    #     "Dominant_Topic",
-    #     "Topic_Perc_Contrib",
-    #     "Keywords",
-    #     "Text",
-    # ]
+    df_dominant_topic = df_topic_sents_keywords.reset_index()
+    df_dominant_topic.columns = [
+        "Document_No",
+        "Dominant_Topic",
+        "Topic_Perc_Contrib",
+        "Keywords",
+        "Text",
+    ]
 
     topic_counts, topic_contribution= get_fractional_con_per_topic(df_topic_sents_keywords)
 
