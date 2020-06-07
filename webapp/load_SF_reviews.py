@@ -3,6 +3,29 @@ import scipy as sp
 import pandas as pd
 import glob
 
+
+def load_yelp_files(region):
+    region = region.lower()
+    if region == 'ny':
+        review_files = glob.glob('scraped_data_nodupl_biz/' + '1????*csv')
+    elif region == 'sf':
+        review_files = glob.glob('scraped_data_nodupl_biz/' + '9????*csv')
+    df_new = read_all_reviews_in_area(review_files)
+    df_new.drop_duplicates(inplace=True, keep='first')
+    return df_new
+
+
+def combine_all_reviews_for_model():
+    """
+    To create model, we need all the reviews to get the topics
+    """
+    df_NY = load_yelp_files('ny')
+    df_SF = load_yelp_files('sf')
+    df = pd.concat([df_NY, df_SF])
+    return df
+
+
+
 def read_all_reviews_in_area(list_of_files):
     for iii, fff in enumerate(list_of_files):
         df = pd.read_csv(fff,
