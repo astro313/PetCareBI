@@ -44,7 +44,6 @@ def format_topics_sentences(ldamodel, corpus, texts):
     return sent_topics_df
 
 
-
 def topics_per_document(model, corpus, start=0, end=1):
     ## most discussed topics in the reviews?
     # Sentence Coloring of N Sentences
@@ -52,7 +51,10 @@ def topics_per_document(model, corpus, start=0, end=1):
     dominant_topics = []
     topic_percentages = []
     for i, corp in enumerate(corpus_sel):
-        topic_percs, wordid_topics, wordid_phivalues = model[corp]
+        try:
+            topic_percs, wordid_topics, _ = model[corp]
+        except ValueError:
+            topic_percs, wordid_topics = model[corp]
         dominant_topic = sorted(topic_percs, key = lambda x: x[1], reverse=True)[0][0]
         dominant_topics.append((i, dominant_topic))
         topic_percentages.append(topic_percs)
@@ -134,6 +136,7 @@ def plot_topics_distribution_per_biz(df):
     plt.set_ylabel('Number of Reviews')
 #    plt.set_ylim(0, 40)
     plt.show()
+
 
 
 
