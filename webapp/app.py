@@ -14,7 +14,7 @@ def main():
         return(flask.render_template('main.html'))
     if flask.request.method == 'POST':
 
-        df_new = pd.read_csv('data_model/......csv')
+        df_new = pd.read_csv('../data_model/cleaned_tokenized_df-2020-06-07.csv')
         biz_name_option = get_unique_biz_names(df_new)
 
         biz_name = flask.request.form['biz_name']   # ideally, dropdown menu
@@ -23,13 +23,19 @@ def main():
         input_variables = pd.DataFrame([[biz_name, review_rating]],
                                        columns=['biz_name', 'review_rating'])
 
-        df_new = get_review_single_biz(df_new, biz_name)
-        lda_model = load_pretrain_ldamodel(fname=r'data_model/lda_bl_allservice_NYSF_reviews-2020-06-05-10\:45.model')
+        df_new = get_review_single_biz(df_new, biz_name)     # not tested
+        lda_model = load_pretrain_ldamodel(fname=r'/Users/dleung/Hack/pethotel/data_model/lda_bl_allservice_NYSF_reviews-2020-06-05-10:45.model')
 
-        df_dominant_topic_in_each_doc = extract_topics_given_biz(df_new, lda_model, review_rating)
+        try:
+            dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
+        except TypeError:
+            df_new['review_text_lem_cleaned_tokenized_nostop'] = df_new['review_text_lem_cleaned_tokenized_nostop'].apply(lambda x: NLP_cleaning.prep_lda_input(x)).tolist()
+            dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
+
+        df_dominant_topic_in_each_doc = extract_topics_given_biz(df_new, lda_model, dictionary, review_rating)
         # plot_topic_distribution(df_dominant_topic_in_each_doc)
 
-        df_0 = text_summarization(df_new, review_rating)
+        df_0 = text_summarization(df_new, review_rating)  # not tested
 
 
         return flask.render_template('main.html',
@@ -56,13 +62,14 @@ def load_pretrain_ldamodel(fname):
     return lda_model
 
 
-def extract_topics_given_biz(df_new, lda_model, rating='all'):
+def extract_topics_given_biz(df_new, lda_model, dictionary=None, rating='all'):
     if type(rating) != str:
         df_new = df_new[df_new['review_rating'] == float(rating)]
 
     tokenized_text = df_new['review_text_lem_cleaned_tokenized_nostop']
 
-    df_dominant_topic_in_each_doc = ldacomplaints.get_topics_distributions_per_biz(tokenized_text, lda_model)
+    df_dominant_topic_in_each_doc = ldacomplaints.get_topics_distributions_per_biz(tokenized_text, lda_model,
+                                         dictionary)
     return df_dominant_topic_in_each_doc
 
 
