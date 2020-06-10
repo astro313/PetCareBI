@@ -9,7 +9,8 @@ from gensim import models
 import sys
 sys.path.append('/Users/dleung/Hack/pethotel/src')
 
-DATA_PATH = '../data_model/cleaned_tokenized_df-2020-06-07.csv'
+# DATA_PATH = '../data_model/cleaned_tokenized_df-2020-06-07.csv'
+DATA_PATH = '../data_model/cleaned_tokenized_df-2020-06-10.csv'
 MODEL_PATH = r'/Users/dleung/Hack/pethotel/data_model/lda_hypertuned_nysf_reviews-2020-06-08-09-47.model'
 
 
@@ -86,12 +87,26 @@ def get_dictionary_from_df(df_new):
 
 
 def main(DATA_PATH=None):
-    st.title('PetCare Business Intelligence')
-    st.markdown('It’s all about the experience! Good experience inspires pet owners to also generate referrals. \n  PetCare is a BI dashboard built to help business owner in pet service industry stand out from competitors and improve customer retention by understanding customers\' feedback on services quickly. \n\n We understand that customer reviews are often wordy with important information buried in unstructued text, written in different styles, and cover a few different aspects in a single review. \n\n Use PetCare to gain insights into your strengths and weaknesses!')
 
-    # 1. fetch reviews
-    # 2. remove duplicates
-    # 3. NLP_clean text
+    st.sidebar.subheader("About App")
+    st.sidebar.text("PetCare BI with Streamlit")
+
+    st.sidebar.subheader("By")
+    st.sidebar.text("T. K. Daisy Leung")
+    st.sidebar.text("tkdaisyleung@gmail")
+
+    st.title('PetCare Business Intelligence')
+    st.markdown('It’s all about personalized experience! Good experience inspires pet owners to also generate referrals. \n  PetCare is a BI dashboard built to help business owner in pet service industry stand out from competitors and improve customer retention by understanding customers\' feedback on services quickly. \n\n We understand that customer reviews are often wordy with important information buried in unstructued text, written in different styles, and cover a few different aspects in a single review. \n\n Use PetCare to gain insights into your **strengths** and **weaknesses**!')
+
+    # 1. fetch reviews regularly
+        # 1. scrape_biz_link_multipage.py
+        # 2. scrape_reviews.py
+        # 3. zipcode_based_drop_dupl_biz.py
+        # 3b. df_NY = load_yelp_files('ny')
+            #  df_SF = load_yelp_files('sf')
+        # df = pd.concat([df_NY, df_SF])
+        # 4. df_new = NLP_cleaning.apply_NLP_cleaning(df)
+        # 5. df_new.to_csv('data_model/cleaned_tokenized_df-2020-....csv', index=False)
 
     # offline mode -- not updating database, use existing cleaning dataframe stored
     df_new = load_data(DATA_PATH)
@@ -121,10 +136,10 @@ def main(DATA_PATH=None):
     if biz_name is not None and len(df_new[df_new['review_rating'] <= 3]) > 0:
         st.write('Oh no! There are some bad reviews.')
 
-    if st.checkbox("Show reviews", False):
-        st.subheader("Reviews for {}".format(biz_name))
-        tmp = df_new[['review_date', 'review_rating', 'review_text']].reset_index(drop=True)
-        st.write(tmp)
+    # if st.checkbox("Show reviews", False):
+    #     st.subheader("Reviews for {}".format(biz_name))
+    #     tmp = df_new[['review_date', 'review_rating', 'review_text']].reset_index(drop=True)
+    #     st.write(tmp)
 
     review_rating = st.selectbox("Select review rating:",
                                  ['All', '1', '2', '3', '4', '5']
@@ -166,15 +181,6 @@ def main(DATA_PATH=None):
     btn = st.button("Celebrate!")
     if btn:
         st.balloons()
-
-    st.subheader("About")
-
-    st.sidebar.subheader("About App")
-    st.sidebar.text("PetCare BI with Streamlit")
-
-    st.sidebar.subheader("By")
-    st.sidebar.text("T. K. Daisy Leung")
-    st.sidebar.text("tkdaisyleung@gmail")
 
 
 if __name__ == '__main__':
