@@ -6,8 +6,11 @@ import NLP_summarization
 import ldacomplaints
 import altair as alt
 from gensim import models
+import sys
+sys.path.append('/Users/dleung/Hack/pethotel/src')
 
 DATA_PATH = '../data_model/cleaned_tokenized_df-2020-06-07.csv'
+MODEL_PATH = r'/Users/dleung/Hack/pethotel/data_model/lda_hypertuned_nysf_reviews-2020-06-08-09-47.model'
 
 
 def get_unique_biz_names(df):
@@ -47,47 +50,59 @@ def plot_topic_distribution(df_dominant_topic_in_each_doc):
     ldacomplaints.plot_topics_distribution_per_biz(df_dominant_topic_in_each_doc)
     return None
 
-def text_summarization(df, review_rating='all'):
-    if type(review_rating) != str:
-        df = df[df['review_rating'] == float(review_rating)]
 
-    # text summarization
-    df_0 = NLP_summarization.clean_special_char(df, 'review_text')
-    # summary, kw = NLP_summarization.extractive_sum(df_0['review_text'])
-    df_0['summary'], df_0['kw'] = df_0['review_text'].apply(lambda x: NLP_summarization.extractive_sum(x))
+def text_summarization(df, mode, review_rating='all'):
+    if review_rating.lower() != 'all':
+        df = df[df['review_rating'] == float(review_rating)]
+    if mode.lower() == 'extractive':
+        df_0 = NLP_summarization.clean_special_char(df, 'review_text_raw')
+        df_0['summary'], df_0['kw'] = df_0['review_text_raw'].apply(lambda x: NLP_summarization.extractive_sum(x))
+
+    elif mode.lower() == 'abstractive':
+        df_0['summary'] = df['review_text_raw'].apply(lambda x: NLP_summarization.abstractive_sum(x))
+
     return df_0
 
 
 @st.cache(allow_output_mutation=True)
-def load_data(DATA_PATH=DATA_PATH):
+def load_data(DATA_PATH):
     df_new = pd.read_csv(DATA_PATH)
     return df_new
 
 @st.cache(allow_output_mutation=True)
-def load_LDA_model(fname=r'/Users/dleung/Hack/pethotel/data_model/lda_hypertuned_nysf_reviews-2020-06-08-09-47.model'):
+def load_LDA_model(fname):
     lda_model = load_pretrain_ldamodel(fname=fname)
     return lda_model
 
 
+@st.cache
+def get_dictionary_from_df(df_new):
+    try:
+    dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
+    except TypeError:
+        df_new['review_text_lem_cleaned_tokenized_nostop'] = df_new['review_text_lem_cleaned_tokenized_nostop'].apply(lambda x: NLP_cleaning.prep_lda_input(x)).tolist()
+        dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
+    return dictionary, df_new
 
 
 # ------ streamlit ----------
 st.title('PetCare Business Intelligence')
 st.markdown('It’s all about the experience! Good experience inspires pet owners to also generate referrals. \n  PetCare is a BI dashboard built to help business owner in pet service industry stand out from competitors and improve customer retention by understanding customers\' feedback on services quickly. \n\n We understand that customer reviews are often wordy with important information buried in unstructued text, written in different styles, and cover a few different aspects in a single review. \n\n Use PetCare to gain insights into your strengths and weaknesses!')
 
-df_new = load_data()
+# 1. fetch reviews
+# 2. remove duplicates
+# 3. NLP_clean text
+
+# offline mode -- not updating database, use existing cleaning dataframe stored
+df_new = load_data(DATA_PATH)
 biz_name_option = get_unique_biz_names(df_new)
 biz_name_option.insert(0, None)
-lda_model = load_LDA_model()
-try:
-    dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
-except TypeError:
-    df_new['review_text_lem_cleaned_tokenized_nostop'] = df_new['review_text_lem_cleaned_tokenized_nostop'].apply(lambda x: NLP_cleaning.prep_lda_input(x)).tolist()
-    dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
+lda_model = load_LDA_model(MODEL_PATH)
+dictiionary, df_new = get_dictionary_from_df(df_new)
 
 if st.checkbox("Show all reviews", False):
     st.subheader("")
-    st.write(df_new[['biz_name', 'review_date', 'review_rating', 'review_text']])
+    st.write(df_new[['biz_name', 'review_date', 'review_rating', 'review_text_raw']])
 
 st.header("Select your business: ")
 biz_name = st.selectbox("Pick business name", biz_name_option)
@@ -121,12 +136,29 @@ df_dominant_topic_in_each_doc = extract_topics_given_biz(df_new,
 if len(df_dominant_topic_in_each_doc) > 0:
     bars = alt.Chart(df_dominant_topic_in_each_doc, width=500, height=400, title='Dominant topics across reviews').mark_bar(clip=True, color='firebrick', opacity=0.7, size=20).encode(x='Dominant_Topic', y='count')
     st.altair_chart(bars)
+
+    # pie chart
+    import matplotlib.pyplot as plt
+    fig1, ax1 = plt.subplots()
+    ax1.pie(df_dominant_topic_in_each_doc['count'], labels=df_dominant_topic_in_each_doc['Dominant_Topic'], autopct='%1.1f%%',
+            shadow=True, startangle=90)
+    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    st.write(fig1)
 else:
     st.write("No reviews with {} stars on Yelp.".format(review_rating))
 
 
+if st.checkbox("Show executive summary on reviews"):
+    # st.subheader("Summarize Your Text")
+    summary_options = st.selectbox("Choose Summarizer Mode",['Extractive','Abstractive'])
+    if st.button("Summarize"):
+        df_0 = text_summarization(df_new, summary_options, review_rating)  # not tested
+        st.write(df_0)
+        st.success(df_0)
 
-    #     df_0 = text_summarization(df_new, review_rating)  # not tested
+
+st.subheader("Topic trend over years")
+# plot topic trend over year
 
 
 # ------- end --------
@@ -136,3 +168,12 @@ st.write("Yay! You've read all the reviews! Click below to celebrate.")
 btn = st.button("Celebrate!")
 if btn:
     st.balloons()
+
+st.subheader("About")
+
+st.sidebar.subheader("About App")
+st.sidebar.text("PetCare BI with Streamlit")
+
+st.sidebar.subheader("By")
+st.sidebar.text("T. K. Daisy Leung")
+st.sidebar.text("tkdaisyleung@gmail")
