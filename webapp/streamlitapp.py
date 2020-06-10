@@ -78,102 +78,104 @@ def load_LDA_model(fname):
 @st.cache
 def get_dictionary_from_df(df_new):
     try:
-    dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
+        dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
     except TypeError:
         df_new['review_text_lem_cleaned_tokenized_nostop'] = df_new['review_text_lem_cleaned_tokenized_nostop'].apply(lambda x: NLP_cleaning.prep_lda_input(x)).tolist()
         dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
     return dictionary, df_new
 
 
-# ------ streamlit ----------
-st.title('PetCare Business Intelligence')
-st.markdown('It’s all about the experience! Good experience inspires pet owners to also generate referrals. \n  PetCare is a BI dashboard built to help business owner in pet service industry stand out from competitors and improve customer retention by understanding customers\' feedback on services quickly. \n\n We understand that customer reviews are often wordy with important information buried in unstructued text, written in different styles, and cover a few different aspects in a single review. \n\n Use PetCare to gain insights into your strengths and weaknesses!')
+def main(DATA_PATH=None):
+    st.title('PetCare Business Intelligence')
+    st.markdown('It’s all about the experience! Good experience inspires pet owners to also generate referrals. \n  PetCare is a BI dashboard built to help business owner in pet service industry stand out from competitors and improve customer retention by understanding customers\' feedback on services quickly. \n\n We understand that customer reviews are often wordy with important information buried in unstructued text, written in different styles, and cover a few different aspects in a single review. \n\n Use PetCare to gain insights into your strengths and weaknesses!')
 
-# 1. fetch reviews
-# 2. remove duplicates
-# 3. NLP_clean text
+    # 1. fetch reviews
+    # 2. remove duplicates
+    # 3. NLP_clean text
 
-# offline mode -- not updating database, use existing cleaning dataframe stored
-df_new = load_data(DATA_PATH)
-biz_name_option = get_unique_biz_names(df_new)
-biz_name_option.insert(0, None)
-lda_model = load_LDA_model(MODEL_PATH)
-dictiionary, df_new = get_dictionary_from_df(df_new)
+    # offline mode -- not updating database, use existing cleaning dataframe stored
+    df_new = load_data(DATA_PATH)
+    biz_name_option = get_unique_biz_names(df_new)
+    biz_name_option.insert(0, None)
+    lda_model = load_LDA_model(MODEL_PATH)
+    dictionary, df_new = get_dictionary_from_df(df_new)
 
-if st.checkbox("Show all reviews", False):
-    st.subheader("")
-    st.write(df_new[['biz_name', 'review_date', 'review_rating', 'review_text_raw']])
+    if st.checkbox("Show all reviews", False):
+        st.subheader("")
+        st.write(df_new[['biz_name', 'review_date', 'review_rating', 'review_text_raw']])
 
-st.header("Select your business: ")
-biz_name = st.selectbox("Pick business name", biz_name_option)
-df_new = get_review_single_biz(df_new, biz_name)
+    st.header("Select your business: ")
+    biz_name = st.selectbox("Pick business name", biz_name_option)
+    df_new = get_review_single_biz(df_new, biz_name)
 
-# # plot review distribution
-review_pd = df_new.groupby('review_rating').count()['review_text'].reset_index()
-review_pd.columns=['review_rating', 'count']
-bars = alt.Chart(review_pd, width=500, height=400,
-                 title='Review Distribution').mark_bar(clip=True,
-                 color='firebrick', opacity=0.7, size=70).encode(x='review_rating',
-                 y='count')
-st.altair_chart(bars)
-
-
-if biz_name is not None and len(df_new[df_new['review_rating'] <= 3]) > 0:
-    st.write('Oh no! There are some bad reviews.')
-
-if st.checkbox("Show reviews", False):
-    st.subheader("Reviews for {}".format(biz_name))
-    tmp = df_new[['review_date', 'review_rating', 'review_text']].reset_index(drop=True)
-    st.write(tmp)
-
-review_rating = st.selectbox("Select review rating:",
-                             ['All', '1', '2', '3', '4', '5']
-                             )
-df_dominant_topic_in_each_doc = extract_topics_given_biz(df_new,
-                                                         lda_model,
-                                                         dictionary,
-                                                         review_rating)
-if len(df_dominant_topic_in_each_doc) > 0:
-    bars = alt.Chart(df_dominant_topic_in_each_doc, width=500, height=400, title='Dominant topics across reviews').mark_bar(clip=True, color='firebrick', opacity=0.7, size=20).encode(x='Dominant_Topic', y='count')
+    # # plot review distribution
+    review_pd = df_new.groupby('review_rating').count()['review_text'].reset_index()
+    review_pd.columns=['review_rating', 'count']
+    bars = alt.Chart(review_pd, width=500, height=400,
+                     title='Review Distribution').mark_bar(clip=True,
+                     color='firebrick', opacity=0.7, size=70).encode(x='review_rating',
+                     y='count')
     st.altair_chart(bars)
 
-    # pie chart
-    import matplotlib.pyplot as plt
-    fig1, ax1 = plt.subplots()
-    ax1.pie(df_dominant_topic_in_each_doc['count'], labels=df_dominant_topic_in_each_doc['Dominant_Topic'], autopct='%1.1f%%',
-            shadow=True, startangle=90)
-    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    st.write(fig1)
-else:
-    st.write("No reviews with {} stars on Yelp.".format(review_rating))
+
+    if biz_name is not None and len(df_new[df_new['review_rating'] <= 3]) > 0:
+        st.write('Oh no! There are some bad reviews.')
+
+    if st.checkbox("Show reviews", False):
+        st.subheader("Reviews for {}".format(biz_name))
+        tmp = df_new[['review_date', 'review_rating', 'review_text']].reset_index(drop=True)
+        st.write(tmp)
+
+    review_rating = st.selectbox("Select review rating:",
+                                 ['All', '1', '2', '3', '4', '5']
+                                 )
+    df_dominant_topic_in_each_doc = extract_topics_given_biz(df_new,
+                                                             lda_model,
+                                                             dictionary,
+                                                             review_rating)
+    if len(df_dominant_topic_in_each_doc) > 0:
+        bars = alt.Chart(df_dominant_topic_in_each_doc, width=500, height=400, title='Dominant topics across reviews').mark_bar(clip=True, color='firebrick', opacity=0.7, size=20).encode(x='Dominant_Topic', y='count')
+        st.altair_chart(bars)
+
+        # pie chart
+        import matplotlib.pyplot as plt
+        fig1, ax1 = plt.subplots()
+        ax1.pie(df_dominant_topic_in_each_doc['count'], labels=df_dominant_topic_in_each_doc['Dominant_Topic'], autopct='%1.1f%%',
+                shadow=True, startangle=90)
+        ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        st.write(fig1)
+    else:
+        st.write("No reviews with {} stars on Yelp.".format(review_rating))
 
 
-if st.checkbox("Show executive summary on reviews"):
-    # st.subheader("Summarize Your Text")
-    summary_options = st.selectbox("Choose Summarizer Mode",['Extractive','Abstractive'])
-    if st.button("Summarize"):
-        df_0 = text_summarization(df_new, summary_options, review_rating)  # not tested
-        st.write(df_0)
-        st.success(df_0)
+    if st.checkbox("Show executive summary on reviews"):
+        # st.subheader("Summarize Your Text")
+        summary_options = st.selectbox("Choose Summarizer Mode",['Extractive','Abstractive'])
+        if st.button("Summarize"):
+            df_0 = text_summarization(df_new, summary_options, review_rating)  # not tested
+            st.write(df_0)
+            st.success(df_0)
 
 
-st.subheader("Topic trend over years")
-# plot topic trend over year
+    if st.checkbox("Plot topic trend over the years"):
+        st.write('todo')
 
 
-# ------- end --------
+    st.markdown("## Party time!")
+    st.write("Yay! You've read all the reviews! Click below to celebrate.")
+    btn = st.button("Celebrate!")
+    if btn:
+        st.balloons()
 
-st.markdown("## Party time!")
-st.write("Yay! You've read all the reviews! Click below to celebrate.")
-btn = st.button("Celebrate!")
-if btn:
-    st.balloons()
+    st.subheader("About")
 
-st.subheader("About")
+    st.sidebar.subheader("About App")
+    st.sidebar.text("PetCare BI with Streamlit")
 
-st.sidebar.subheader("About App")
-st.sidebar.text("PetCare BI with Streamlit")
+    st.sidebar.subheader("By")
+    st.sidebar.text("T. K. Daisy Leung")
+    st.sidebar.text("tkdaisyleung@gmail")
 
-st.sidebar.subheader("By")
-st.sidebar.text("T. K. Daisy Leung")
-st.sidebar.text("tkdaisyleung@gmail")
+
+if __name__ == '__main__':
+    main(DATA_PATH)
