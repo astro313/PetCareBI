@@ -95,12 +95,12 @@ df_new = get_review_single_biz(df_new, biz_name)
 
 # # plot review distribution
 review_pd = df_new.groupby('review_rating').count()['review_text'].reset_index()
-review_pd.columns=[['review_rating', 'count']]
-# bars = alt.Chart(review_pd, width=500, height=400,
-#                  title='Review Distribution').mark_bar(clip=True,
-#                  color='firebrick', opacity=0.7).encode(x='review_rating',
-#                  y='count')
-# st.altair_chart(bars)
+review_pd.columns=['review_rating', 'count']
+bars = alt.Chart(review_pd, width=500, height=400,
+                 title='Review Distribution').mark_bar(clip=True,
+                 color='firebrick', opacity=0.7, size=70).encode(x='review_rating',
+                 y='count')
+st.altair_chart(bars)
 
 
 if biz_name is not None and len(df_new[df_new['review_rating'] <= 3]) > 0:
@@ -119,22 +119,12 @@ df_dominant_topic_in_each_doc = extract_topics_given_biz(df_new,
                                                          dictionary,
                                                          review_rating)
 if len(df_dominant_topic_in_each_doc) > 0:
-    bars = alt.Chart(df_dominant_topic_in_each_doc, width=500, height=400, title='Dominant topics across reviews').mark_bar(clip=True, color='firebrick', opacity=0.7).encode(x='Dominant_Topic', y='count')
+    bars = alt.Chart(df_dominant_topic_in_each_doc, width=500, height=400, title='Dominant topics across reviews').mark_bar(clip=True, color='firebrick', opacity=0.7, size=20).encode(x='Dominant_Topic', y='count')
     st.altair_chart(bars)
 else:
     st.write("No reviews with {} stars on Yelp.".format(review_rating))
 
 
-
-# plot_topic_distribution(df_dominant_topic_in_each_doc
-    # alt.Chart('Dominant_Topic', 'count', data=df, width=.5, color='firebrick')
-    # # plt.set_xticks(range(df_dominant_topic_in_each_doc.Dominant_Topic.unique().__len__()))
-    # # tick_formatter = FuncFormatter(lambda x, pos: 'Topic ' + str(x)+ '\n' + df_top3words.loc[df_top3words.topic_id==x, 'words'].values[0])
-    # # plt.xaxis.set_major_formatter(tick_formatter)
-    # plt.title('Number of Documents by Dominant Topic',
-    #               fontdict=dict(size=10))
-    # plt.ylabel('Number of Reviews')
-# st.pyplot()
 
     #     df_0 = text_summarization(df_new, review_rating)  # not tested
 
