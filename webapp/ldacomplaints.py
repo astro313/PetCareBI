@@ -130,8 +130,11 @@ def get_topics_distributions_per_biz(list_of_tokenized_text, lda_model, dictiona
 
     # # of reviews in each dominant_topic
     dominant_topics, topic_percentages = topics_per_document(model=lda_model,
-                                                             corpus=bow_corpus)#,
-                                                             # end=-1)
+                                                             corpus=bow_corpus,
+                                                             end=-1)
+    if len(dominant_topics) == 0:
+        dominant_topics, topic_percentages = topics_per_document(model=lda_model, corpus=bow_corpus)
+
     df_123 = pd.DataFrame(dominant_topics, columns=[
                           'Document_Id', 'Dominant_Topic'])
     dominant_topic_in_each_doc = df_123.groupby('Dominant_Topic').size()
