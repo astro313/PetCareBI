@@ -23,8 +23,8 @@ def main():
         input_variables = pd.DataFrame([[biz_name, review_rating]],
                                        columns=['biz_name', 'review_rating'])
 
-        df_new = get_review_single_biz(df_new, biz_name)     # not tested
-        lda_model = load_pretrain_ldamodel(fname=r'/Users/dleung/Hack/pethotel/data_model/lda_bl_allservice_NYSF_reviews-2020-06-05-10:45.model')
+        df_new = get_review_single_biz(df_new, biz_name)
+        lda_model = load_pretrain_ldamodel(fname=r'/Users/dleung/Hack/pethotel/data_model/lda_hypertuned_nysf_reviews-2020-06-08-09-47.model')
 
         try:
             dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
@@ -51,7 +51,8 @@ def get_unique_biz_names(df):
 
 
 def get_review_single_biz(df, biz_name):
-    df = df[df.biz_name.str.lower() == biz_name]
+    df = df[df.biz_name.str.lower() == biz_name.lower()]
+    return df
 
 def preprocess_loaded_reviews(df):
     df = NLP_cleaning.apply_NLP_cleaning(df)
@@ -83,8 +84,8 @@ def text_summarization(df, review_rating='all'):
 
     # text summarization
     df_0 = NLP_summarization.clean_special_char(df, 'review_text')
-    # summary, kw = NLP_summarization.summarize_this_review(df_0['review_text'])
-    df_0['summary'], df_0['kw'] = df_0['review_text'].apply(lambda x: NLP_summarization.summarize_this_review(x))
+    # summary, kw = NLP_summarization.extractive_sum(df_0['review_text'])
+    df_0['summary'], df_0['kw'] = df_0['review_text'].apply(lambda x: NLP_summarization.extractive_sum(x))
     return df_0
 
 
