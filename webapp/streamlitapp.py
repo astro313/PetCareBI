@@ -9,9 +9,9 @@ from gensim import models
 import sys
 sys.path.append('/Users/dleung/Hack/pethotel/src')
 
-# DATA_PATH = '../data_model/cleaned_tokenized_df-2020-06-07.csv'
+
 DATA_PATH = '../data_model/cleaned_tokenized_df-2020-06-10.csv'
-MODEL_PATH = r'/Users/dleung/Hack/pethotel/data_model/lda_hypertuned_nysf_reviews-2020-06-08-09-47.model'
+MODEL_PATH = r'/Users/dleung/Hack/pethotel/data_model/lda_hypertuned_nysf_reviews-2020-06-10-19-30.model'
 
 
 def get_unique_biz_names(df):
@@ -76,7 +76,7 @@ def load_LDA_model(fname):
     return lda_model
 
 
-@st.cache
+@st.cache(allow_output_mutation=True)
 def get_dictionary_from_df(df_new):
     try:
         dictionary, _ = ldacomplaints.get_dict_and_corpus(df_new['review_text_lem_cleaned_tokenized_nostop'])
@@ -135,12 +135,6 @@ def main(DATA_PATH=None):
 
     if biz_name is not None and len(df_new[df_new['review_rating'] <= 3]) > 0:
         st.write('Oh no! There are some bad reviews.')
-
-    # if st.checkbox("Show reviews", False):
-    #     st.subheader("Reviews for {}".format(biz_name))
-    #     tmp = df_new[['review_date', 'review_rating', 'review_text']].reset_index(drop=True)
-    #     st.write(tmp)
-
     review_rating = st.selectbox("Select review rating:",
                                  ['All', '1', '2', '3', '4', '5']
                                  )
@@ -149,8 +143,8 @@ def main(DATA_PATH=None):
                                                              dictionary,
                                                              review_rating)
     if len(df_dominant_topic_in_each_doc) > 0:
-        bars = alt.Chart(df_dominant_topic_in_each_doc, width=500, height=400, title='Dominant topics across reviews').mark_bar(clip=True, color='firebrick', opacity=0.7, size=20).encode(x='Dominant_Topic', y='count')
-        st.altair_chart(bars)
+        # bars = alt.Chart(df_dominant_topic_in_each_doc, width=500, height=400, title='Dominant topics across reviews').mark_bar(clip=True, color='firebrick', opacity=0.7, size=20).encode(x='Dominant_Topic', y='count')
+        # st.altair_chart(bars)
 
         # pie chart
         import matplotlib.pyplot as plt
@@ -162,6 +156,46 @@ def main(DATA_PATH=None):
     else:
         st.write("No reviews with {} stars on Yelp.".format(review_rating))
 
+    if st.checkbox("Plot topic trend over the years (given review rating)"):
+        st.write("Showing the distribution of topics covered by customer reviews over the years. \n (Normalized by the number of review per year shown.")
+        df_tmp = df_new[df_new['review_rating'] == float(review_rating)]
+        df_tmp['year'] = pd.to_datetime(df_tmp.review_date).dt.year
+        min_yr = df_tmp['year'].min()
+        max_yr = df_tmp['year'].max()
+        nbin = max_yr - min_yr
+        bu = pd.cut(df_tmp.year, bins=nbin)
+        gp = df_tmp.groupby(bu).count()['review_text']
+        gp = gp.reset_index()
+        gp.columns = ['year', 'review_count']
+        gp_review = df_tmp.groupby(bu)['review_text_lem_cleaned_tokenized_nostop'].agg(list)
+        gp_review = gp_review.reset_index()
+
+        counting_dict = {}
+        for xx in range(len(gp_review)):
+            # loop through each year.
+            year = int(round(gp_review.year.loc[xx].left))
+            df_dominant_topic_in_each_doc = extract_topics_given_biz(gp_review.iloc[xx],
+                                                                     lda_model,
+                                                                     dictionary
+                                                             )
+            counting_dict[str(year)] = df_dominant_topic_in_each_doc
+        for jj in counting_dict.keys():
+            if jj == list(counting_dict.keys())[0]:
+                holder = counting_dict[jj]
+            try:
+                holder = pd.merge(holder, counting_dict[str(int(jj)+1)],
+                                  on='Dominant_Topic', how='outer')
+            except:
+                pass
+        holder.index = holder['Dominant_Topic']
+        holder.drop(columns=['Dominant_Topic'], inplace=True)
+        holder.fillna(0, inplace=True)   # replace Nan with 0
+        # normalize # using total count in each year
+        holder.columns = list(counting_dict.keys())
+        holder = holder.T
+        tmp = holder.div(holder.sum(axis=1), axis=0)
+        tmp.plot(kind='bar')
+        st.pyplot()
 
     if st.checkbox("Show executive summary on reviews"):
         # st.subheader("Summarize Your Text")
@@ -172,8 +206,7 @@ def main(DATA_PATH=None):
             st.success(df_0)
 
 
-    if st.checkbox("Plot topic trend over the years"):
-        st.write('todo')
+
 
 
     st.markdown("## Party time!")
