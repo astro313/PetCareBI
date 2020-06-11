@@ -58,7 +58,8 @@ def text_summarization(df, mode):
             lambda x: NLP_summarization.extractive_sum(x))
 
     elif mode.lower() == 'abstractive':
-        df_0['ab_summary'] = df['review_text_raw'].apply(
+        df_0 = df
+        df_0['ab_summary'] = df_0['review_text_raw'].apply(
             lambda x: NLP_summarization.abstractive_sum(x))
 
     return df_0
