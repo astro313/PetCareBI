@@ -80,7 +80,7 @@ def get_dict_and_corpus(list_of_tokenized_text):
 
 
 
-def lda_analysis(list_of_tokenized_text, num_topics=5):
+def lda_analysis(list_of_tokenized_text, lab, num_topics=5):
     """
     list_of_tokenized_text: all reviews
     """
@@ -111,8 +111,44 @@ def lda_analysis(list_of_tokenized_text, num_topics=5):
         "Keywords",
         "review_text_lem_cleaned_tokenized_nostop",
     ]
+    df_dominant_topic['Dominant_Topic_label'] = df_dominant_topic.apply(lambda x: map_label_to_TopicID(x, lab), axis=1)
 
     return lda_model, df_dominant_topic, topic_contribution
+
+
+def map_label_to_TopicID(row, labellist):
+
+    if int(row['Dominant_Topic']) == 0:
+        row['Dominant_Topic_label'] = labellist[0]
+    elif int(row['Dominant_Topic']) == 1:
+        row['Dominant_Topic_label'] = labellist[1]
+    elif int(row['Dominant_Topic']) == 2:
+        row['Dominant_Topic_label'] = labellist[2]
+    elif int(row['Dominant_Topic']) == 3:
+        row['Dominant_Topic_label'] = labellist[3]
+    elif int(row['Dominant_Topic']) == 4:
+        row['Dominant_Topic_label'] = labellist[4]
+    elif int(row['Dominant_Topic']) == 5:
+        row['Dominant_Topic_label'] = labellist[5]
+    elif int(row['Dominant_Topic']) == 6:
+        row['Dominant_Topic_label'] = labellist[6]
+    elif int(row['Dominant_Topic']) == 7:
+        row['Dominant_Topic_label'] = labellist[7]
+    elif int(row['Dominant_Topic']) == 8:
+        row['Dominant_Topic_label'] = labellist[8]
+    elif int(row['Dominant_Topic']) == 9:
+        row['Dominant_Topic_label'] = labellist[9]
+    elif int(row['Dominant_Topic']) == 10:
+        row['Dominant_Topic_label'] = labellist[10]
+    elif int(row['Dominant_Topic']) == 11:
+        row['Dominant_Topic_label'] = labellist[11]
+    elif int(row['Dominant_Topic']) == 12:
+        row['Dominant_Topic_label'] = labellist[12]
+    elif int(row['Dominant_Topic']) == 13:
+        row['Dominant_Topic_label'] = labellist[13]
+    elif int(row['Dominant_Topic']) == 14:
+        row['Dominant_Topic_label'] = labellist[14]
+    return row
 
 
 def get_fractional_con_per_topic(df_topic_sents_keywords):
