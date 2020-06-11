@@ -11,13 +11,18 @@ from gensim.summarization import summarize, keywords
 from pprint import pprint
 
 
-def extractive_sum(review):
-
-    summary = summarize(review, ratio=0.2)  # word_count=20)    # max words
-    kw = keywords(review)
-    # Important keywords from the paragraph
-    print("important keywords: \n", )
-    return summary, kw
+def extractive_sum(review, ratio=0.2):
+    try:
+        summary = summarize(review, ratio=ratio)  # word_count=20)    # max words
+        summary = summary.replace("\n", " ")
+    except ValueError:
+        # too few sentences
+        summary = review
+    # finally:
+    #     # Important keywords from the paragraph
+    #     kw = keywords(review).replace('\n', '/')
+    # print("important keywords: \n", )
+    return summary   # , kw
 
 
 def clean_special_char(df, text_field):
