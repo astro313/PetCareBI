@@ -181,13 +181,16 @@ def main(DATA_PATH=None):
                                                              dictionary)
 
     if len(df_dominant_topic_in_each_doc) > 0:
+        # get label
+        df_dominant_topic_in_each_doc = df_dominant_topic_in_each_doc.apply(lambda x: ldacomplaints.map_label_to_TopicID(x, lda_model_label), axis=1)
         # bars = alt.Chart(df_dominant_topic_in_each_doc, width=500, height=400, title='Dominant topics across reviews').mark_bar(clip=True, color='firebrick', opacity=0.7, size=20).encode(x='Dominant_Topic', y='count')
         # st.altair_chart(bars)
 
         # pie chart
         import matplotlib.pyplot as plt
         fig1, ax1 = plt.subplots()
-        ax1.pie(df_dominant_topic_in_each_doc['count'], labels=df_dominant_topic_in_each_doc['Dominant_Topic'], autopct='%1.1f%%',
+        ax1.pie(df_dominant_topic_in_each_doc['count'], labels=df_dominant_topic_in_each_doc['Dominant_Topic_label'],
+            # autopct='%1.1f%%',
                 shadow=True, startangle=90)
         # Equal aspect ratio ensures that pie is drawn as a circle.
         ax1.axis('equal')
