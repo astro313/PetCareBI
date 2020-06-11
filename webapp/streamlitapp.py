@@ -75,7 +75,7 @@ def render_summary(df, ii, summary_options):
     st.markdown('### Summarized Review \n\n')
     st.markdown(review_sum)
     st.markdown('#### Original Review \n')
-    st.markdown(review_raw)
+    st.write(review_raw)
 
 
 @st.cache(allow_output_mutation=True)
