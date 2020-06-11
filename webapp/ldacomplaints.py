@@ -120,7 +120,7 @@ def get_label(lda_model, bow_corpus, list_of_tokenized_text, lab):
         "Keywords",
         "review_text_lem_cleaned_tokenized_nostop",
     ]
-    df_dominant_topic['Dominant_Topic_label'] = df_dominant_topic.apply(lambda x: map_label_to_TopicID(x, lab), axis=1)
+    df_dominant_topic = df_dominant_topic.apply(lambda x: map_label_to_TopicID(x, lab), axis=1)
     return df_dominant_topic
 
 
