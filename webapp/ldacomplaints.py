@@ -101,6 +101,15 @@ def lda_analysis(list_of_tokenized_text, lab, num_topics=5):
     topic_counts, topic_contribution = get_fractional_con_per_topic(
         df_topic_sents_keywords)
 
+    df_dominant_topic = get_label(lda_model, bow_corpus,
+                                  list_of_tokenized_text, lab)
+
+    return lda_model, df_dominant_topic, topic_contribution
+
+
+def get_label(lda_model, bow_corpus, list_of_tokenized_text, lab):
+    df_topic_sents_keywords = format_topics_sentences(
+        ldamodel=lda_model, corpus=bow_corpus, texts=list_of_tokenized_text)
     df_dominant_topic = df_topic_sents_keywords.reset_index()
     df_dominant_topic.columns = 'level_0', 'level', 'Dominant_Topic', 'Perc_Contribution', 'Topic_Keywords', 'Document_No', 'review_text_lem_cleaned_tokenized_nostop'
     df_dominant_topic.drop(columns=['level_0', 'level'], inplace=True)
@@ -112,8 +121,8 @@ def lda_analysis(list_of_tokenized_text, lab, num_topics=5):
         "review_text_lem_cleaned_tokenized_nostop",
     ]
     df_dominant_topic['Dominant_Topic_label'] = df_dominant_topic.apply(lambda x: map_label_to_TopicID(x, lab), axis=1)
+    return df_dominant_topic
 
-    return lda_model, df_dominant_topic, topic_contribution
 
 
 def map_label_to_TopicID(row, labellist):
