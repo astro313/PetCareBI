@@ -12,6 +12,7 @@ sys.path.append('/Users/dleung/Hack/pethotel/src')
 
 DATA_PATH = '../data_model/cleaned_tokenized_df-2020-06-10.csv'
 MODEL_PATH = r'/Users/dleung/Hack/pethotel/data_model/lda_hypertuned_nysf_reviews-2020-06-10-19-30.model'
+MODEL_LABEL_PATH = '/Users/dleung/Hack/pethotel/data_model/lda_hypertuned_nysf_reviews_14topics-2020-06-19-19:40.model.labels'
 
 
 def get_unique_biz_names(df):
@@ -35,6 +36,11 @@ def load_pretrain_ldamodel(fname):
     lda_model = models.LdaModel.load(fname)
     return lda_model
 
+
+def load_labels_pretrained_LDA(MODEL_LABEL_PATH):
+    import pickle
+    lab = pickle.load(open(MODEL_LABEL_PATH, 'rb'))
+    return lab
 
 def extract_topics_given_biz(df_new, lda_model, dictionary=None):
     tokenized_text = df_new['review_text_lem_cleaned_tokenized_nostop']
@@ -133,6 +139,7 @@ def main(DATA_PATH=None):
     biz_name_option = get_unique_biz_names(df_new)
     biz_name_option.insert(0, None)
     lda_model = load_LDA_model(MODEL_PATH)
+    lda_model_label = load_labels_pretrained_LDA(MODEL_LABEL_PATH)
     dictionary, df_new = get_dictionary_from_df(df_new)
 
     if st.checkbox("Show all reviews", False):
