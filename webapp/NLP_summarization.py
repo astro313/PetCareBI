@@ -18,6 +18,8 @@ def extractive_sum(review, ratio=0.2):
     except ValueError:
         # too few sentences
         summary = review
+    if len(summary) == 0:
+        summary = review
     # finally:
     #     # Important keywords from the paragraph
     #     kw = keywords(review).replace('\n', '/')
