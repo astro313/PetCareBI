@@ -24,6 +24,10 @@ def format_topics_sentences(ldamodel, corpus, texts):
 
     # Get main topic in each document
     for i, row in enumerate(ldamodel[corpus]):
+        try:
+            row = row[0] if ldamodel.per_word_topics else row
+        except:
+            pass
         row = sorted(row, key=lambda x: (x[1]), reverse=True)
         # Get the Dominant topic, Perc Contribution and Keywords for each
         # document
@@ -94,18 +98,19 @@ def lda_analysis(list_of_tokenized_text, num_topics=5):
     # dom_topc, percent, review_texts
     df_topic_sents_keywords = format_topics_sentences(
         ldamodel=lda_model, corpus=bow_corpus, texts=list_of_tokenized_text)
+    topic_counts, topic_contribution = get_fractional_con_per_topic(
+        df_topic_sents_keywords)
 
     df_dominant_topic = df_topic_sents_keywords.reset_index()
+    df_dominant_topic.columns = 'level_0', 'level', 'Dominant_Topic', 'Perc_Contribution', 'Topic_Keywords', 'Document_No', 'review_text_lem_cleaned_tokenized_nostop'
+    df_dominant_topic.drop(columns=['level_0', 'level'], inplace=True)
     df_dominant_topic.columns = [
         "Document_No",
         "Dominant_Topic",
         "Topic_Perc_Contrib",
         "Keywords",
-        "Text",
+        "review_text_lem_cleaned_tokenized_nostop",
     ]
-
-    topic_counts, topic_contribution = get_fractional_con_per_topic(
-        df_topic_sents_keywords)
 
     return lda_model, df_dominant_topic, topic_contribution
 
