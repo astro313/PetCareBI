@@ -57,10 +57,10 @@ def text_summarization(df, mode, review_rating='all'):
         df = df[df['review_rating'] == float(review_rating)]
     if mode.lower() == 'extractive':
         df_0 = NLP_summarization.clean_special_char(df, 'review_text_raw')
-        df_0['summary'], df_0['kw'] = df_0['review_text_raw'].apply(lambda x: NLP_summarization.extractive_sum(x))
+        df_0['ex_summary'] = df_0['review_text_raw'].apply(lambda x: NLP_summarization.extractive_sum(x))
 
     elif mode.lower() == 'abstractive':
-        df_0['summary'] = df['review_text_raw'].apply(lambda x: NLP_summarization.abstractive_sum(x))
+        df_0['ab_summary'] = df['review_text_raw'].apply(lambda x: NLP_summarization.abstractive_sum(x))
 
     return df_0
 
@@ -135,8 +135,13 @@ def main(DATA_PATH=None):
 
     if biz_name is not None and len(df_new[df_new['review_rating'] <= 3]) > 0:
         st.write('Oh no! There are some bad reviews.')
+
+    review_rating_option = df_new['review_rating'].unique()
+    review_rating_option.sort()
+    review_rating_option = [str(int(i)) for i in review_rating_option]
+    review_rating_option.insert(0, 'All')
     review_rating = st.selectbox("Select review rating:",
-                                 ['All', '1', '2', '3', '4', '5']
+                                 review_rating_option,
                                  )
     df_dominant_topic_in_each_doc = extract_topics_given_biz(df_new,
                                                              lda_model,
@@ -153,63 +158,70 @@ def main(DATA_PATH=None):
                 shadow=True, startangle=90)
         ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
         st.write(fig1)
+
+        if st.checkbox("Plot topic trend over the years (given selected review rating)"):
+            st.write("Showing the distribution of topics covered by customer reviews over the years. \n\n (Normalized by the number of review per year shown.)")
+
+            if review_rating.lower() != 'all':
+                df_tmp = df_new[df_new['review_rating'] == float(review_rating)]
+            else:
+                df_tmp = df_new
+            if len(df_tmp) < 0:
+                st.write('No reviews ')
+            else:
+                df_tmp['year'] = pd.to_datetime(df_tmp.review_date).dt.year
+                min_yr = df_tmp['year'].min()
+                max_yr = df_tmp['year'].max()
+                nbin = max(1, max_yr-min_yr)
+                bu = pd.cut(df_tmp.year, bins=nbin)
+                gp = df_tmp.groupby(bu).count()['review_text']
+                gp = gp.reset_index()
+                gp.columns = ['year', 'review_count']
+                gp_review = df_tmp.groupby(bu)['review_text_lem_cleaned_tokenized_nostop'].agg(list)
+                gp_review = gp_review.reset_index()
+
+                counting_dict = {}
+                for xx in range(len(gp_review)):
+                    # loop through each year.
+                    year = int(round(gp_review.year.loc[xx].left))
+                    df_dominant_topic_in_each_doc = extract_topics_given_biz(gp_review.iloc[xx],
+                                                                             lda_model,
+                                                                             dictionary
+                                                                     )
+                    counting_dict[str(year)] = df_dominant_topic_in_each_doc
+                for jj in counting_dict.keys():
+                    if jj == list(counting_dict.keys())[0]:
+                        holder = counting_dict[jj]
+                    try:
+                        holder = pd.merge(holder, counting_dict[str(int(jj)+1)],
+                                          on='Dominant_Topic', how='outer')
+                    except:
+                        pass
+                holder.index = holder['Dominant_Topic']
+                holder.drop(columns=['Dominant_Topic'], inplace=True)
+                holder.fillna(0, inplace=True)   # replace Nan with 0
+                # normalize # using total count in each year
+                holder.columns = list(counting_dict.keys())
+                holder = holder.T
+                tmp = holder.div(holder.sum(axis=1), axis=0)
+                tmp.plot(kind='bar')
+                st.pyplot()
+
+
+        if st.checkbox("Show executive summary on reviews (given selected review rating)"):
+            # st.subheader("Summarize Your Text")
+            reviews = st.number_input(label="Number of reviews", min_value=1, max_value=len())
+
+            summary_options = st.selectbox("Choose Summarizer Mode",['Extractive','Abstractive'])
+            if st.button("Summarize"):
+                df_0 = text_summarization(df_new, summary_options, review_rating)  # not tested
+                if summary_options.lower() == 'extractive':
+                    st.write(df_0['ex_summary'])
+                elif summary_options.lower() == 'abstractive':
+                    st.write(df_0['ab_summary'])
+                st.success(df_0)
     else:
         st.write("No reviews with {} stars on Yelp.".format(review_rating))
-
-    if st.checkbox("Plot topic trend over the years (given review rating)"):
-        st.write("Showing the distribution of topics covered by customer reviews over the years. \n\n (Normalized by the number of review per year shown.)s")
-
-        if review_rating.lower() != 'all':
-            df_tmp = df_new[df_new['review_rating'] == float(review_rating)]
-        else:
-            df_tmp = df_new
-        df_tmp['year'] = pd.to_datetime(df_tmp.review_date).dt.year
-        min_yr = df_tmp['year'].min()
-        max_yr = df_tmp['year'].max()
-        nbin = max_yr - min_yr
-        bu = pd.cut(df_tmp.year, bins=nbin)
-        gp = df_tmp.groupby(bu).count()['review_text']
-        gp = gp.reset_index()
-        gp.columns = ['year', 'review_count']
-        gp_review = df_tmp.groupby(bu)['review_text_lem_cleaned_tokenized_nostop'].agg(list)
-        gp_review = gp_review.reset_index()
-
-        counting_dict = {}
-        for xx in range(len(gp_review)):
-            # loop through each year.
-            year = int(round(gp_review.year.loc[xx].left))
-            df_dominant_topic_in_each_doc = extract_topics_given_biz(gp_review.iloc[xx],
-                                                                     lda_model,
-                                                                     dictionary
-                                                             )
-            counting_dict[str(year)] = df_dominant_topic_in_each_doc
-        for jj in counting_dict.keys():
-            if jj == list(counting_dict.keys())[0]:
-                holder = counting_dict[jj]
-            try:
-                holder = pd.merge(holder, counting_dict[str(int(jj)+1)],
-                                  on='Dominant_Topic', how='outer')
-            except:
-                pass
-        holder.index = holder['Dominant_Topic']
-        holder.drop(columns=['Dominant_Topic'], inplace=True)
-        holder.fillna(0, inplace=True)   # replace Nan with 0
-        # normalize # using total count in each year
-        holder.columns = list(counting_dict.keys())
-        holder = holder.T
-        tmp = holder.div(holder.sum(axis=1), axis=0)
-        tmp.plot(kind='bar')
-        st.pyplot()
-
-    if st.checkbox("Show executive summary on reviews"):
-        # st.subheader("Summarize Your Text")
-        summary_options = st.selectbox("Choose Summarizer Mode",['Extractive','Abstractive'])
-        if st.button("Summarize"):
-            df_0 = text_summarization(df_new, summary_options, review_rating)  # not tested
-            st.write(df_0)
-            st.success(df_0)
-
-
 
 
 
