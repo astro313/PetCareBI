@@ -157,8 +157,12 @@ def main(DATA_PATH=None):
         st.write("No reviews with {} stars on Yelp.".format(review_rating))
 
     if st.checkbox("Plot topic trend over the years (given review rating)"):
-        st.write("Showing the distribution of topics covered by customer reviews over the years. \n (Normalized by the number of review per year shown.")
-        df_tmp = df_new[df_new['review_rating'] == float(review_rating)]
+        st.write("Showing the distribution of topics covered by customer reviews over the years. \n\n (Normalized by the number of review per year shown.)s")
+
+        if review_rating.lower() != 'all':
+            df_tmp = df_new[df_new['review_rating'] == float(review_rating)]
+        else:
+            df_tmp = df_new
         df_tmp['year'] = pd.to_datetime(df_tmp.review_date).dt.year
         min_yr = df_tmp['year'].min()
         max_yr = df_tmp['year'].max()
