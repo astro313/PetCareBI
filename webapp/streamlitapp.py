@@ -232,7 +232,11 @@ def main(DATA_PATH=None):
             holder.columns = list(counting_dict.keys())
             holder = holder.T
             tmp = holder.div(holder.sum(axis=1), axis=0)
-            tmp.plot(kind='bar')
+            tmp = tmp.T.reset_index()
+            tmp = tmp.apply(lambda x: ldacomplaints.map_label_to_TopicID(x, lda_model_label), axis=1)
+            tmp = tmp.set_index('Dominant_Topic_label')
+            tmp.drop(columns=['Dominant_Topic'], axis=1, inplace=True)
+            tmp.T.plot(kind='bar')
             st.pyplot()
 
         if st.checkbox("Show executive summary on reviews (given selected review rating)"):
