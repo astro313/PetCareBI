@@ -105,8 +105,9 @@ def get_dictionary_from_df(df_new):
 
 def main(DATA_PATH=None):
 
-    st.sidebar.subheader("About App")
+    st.sidebar.title("About App")
     st.sidebar.text("PetCare BI with Streamlit")
+    st.sidebar.info("This is a demo application written for my Insight Data Science Fellow project. ")
 
     st.sidebar.subheader("By")
     st.sidebar.text("T. K. Daisy Leung")
