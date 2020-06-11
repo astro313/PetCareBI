@@ -71,8 +71,10 @@ def render_summary(df, ii, summary_options):
         summary_field = 'ab_summary'
     review_raw = df.iloc[ii]['review_text_raw']
     review_sum = df.iloc[ii][summary_field]
-    st.text(review_raw)
-    st.text(review_sum)
+    st.markdown('### Summarized Review \n\n')
+    st.markdown(review_sum)
+    st.markdown('#### Original Review \n')
+    st.markdown(review_raw)
 
 
 @st.cache(allow_output_mutation=True)
