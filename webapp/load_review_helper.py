@@ -7,9 +7,9 @@ import glob
 def load_yelp_files(region):
     region = region.lower()
     if region == 'ny':
-        review_files = glob.glob('scraped_data_nodupl_biz/' + '1????*csv')
+        review_files = glob.glob('../data/interim/' + '1????*csv')
     elif region == 'sf':
-        review_files = glob.glob('scraped_data_nodupl_biz/' + '9????*csv')
+        review_files = glob.glob('../data/interim/' + '9????*csv')
     df_new = read_all_reviews_in_area(review_files)
     df_new.drop_duplicates(inplace=True, keep='first')
     return df_new
