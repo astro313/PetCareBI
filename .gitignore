@@ -2,9 +2,6 @@
 __pycache__/
 .ipynb_checkpoints/
 *~
-scraped_data/*.csv
-scraped_data/*.gz
-scraped_data_nodupl_biz/*.csv
-scraped_data_nodupl_biz/*.gz
+data/*/*.csv
 *.png
 *.pdf
