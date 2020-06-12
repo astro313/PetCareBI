@@ -1,4 +1,4 @@
-#PetCareBI
+# PetCareBI
 Your single platform that mimics human ability to comprehend reviews and generate insights, understandable by any business person.
 
 # Motivation
