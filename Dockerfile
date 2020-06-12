@@ -17,6 +17,7 @@ WORKDIR /streamlit-docker
 RUN pip3 install --upgrade pip
 COPY requirements.txt ./requirements.txt
 RUN pip3 --no-cache-dir install -r requirements.txt
+RUN pip3 install matplotlib
 RUN python3 -m nltk.downloader punkt
 RUN python3 -m nltk.downloader wordnet
 RUN python3 -m nltk.downloader stopwords
