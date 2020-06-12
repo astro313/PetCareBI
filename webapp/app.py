@@ -6,13 +6,15 @@ import NLP_summarization
 import ldacomplaints
 import altair as alt
 from gensim import models
-import sys
-sys.path.append('/Users/dleung/Hack/pethotel/src')
+import os, sys
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# print(ROOT_DIR)
+sys.path.append(os.path.join(ROOT_DIR, 'src'))
 
 
-DATA_PATH = '../data/processed/cleaned_tokenized_df-2020-06-10.csv'
-MODEL_PATH = r'/Users/dleung/Hack/pethotel/LDAmodel/lda_hypertuned_nysf_reviews-2020-06-10-19-30.model'
-MODEL_LABEL_PATH = '/Users/dleung/Hack/pethotel/LDAmodel/lda_hypertuned_nysf_reviews_14topics-2020-06-19-19:40.model.labels'
+DATA_PATH = os.path.join(ROOT_DIR, 'data/processed/cleaned_tokenized_df-2020-06-10.csv')
+MODEL_PATH = os.path.join(ROOT_DIR, 'LDAmodel/lda_hypertuned_nysf_reviews-2020-06-10-19-30.model')
+MODEL_LABEL_PATH = os.path.join(ROOT_DIR, 'LDAmodel/lda_hypertuned_nysf_reviews_14topics-2020-06-19-19:40.model.labels')
 
 
 def get_unique_biz_names(df):
