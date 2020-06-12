@@ -59,7 +59,7 @@ def plot_topic_distribution(df_dominant_topic_in_each_doc):
     return None
 
 
-def text_summarization(df, mode):
+def text_summarization(df, mode, model=None, device=None, tokenizer=None):
     if mode.lower() == 'extractive':
         df_0 = NLP_summarization.clean_special_char(df, 'review_text_raw')
         df_0['ex_summary'] = df_0['review_text_raw'].apply(
@@ -68,7 +68,9 @@ def text_summarization(df, mode):
     elif mode.lower() == 'abstractive':
         df_0 = df
         df_0['ab_summary'] = df_0['review_text_raw'].apply(
-            lambda x: NLP_summarization.abstractive_sum(x))
+            lambda x: NLP_summarization.abstractive_sum(x, model=model,
+                                                    tokenizer=tokenizer,
+                                                    device=device))
 
     return df_0
 
@@ -247,12 +249,13 @@ def main(DATA_PATH=None):
                 label="Pick number of most recent reviews", min_value=1, max_value=len(df_new))
             summary_options = st.selectbox("Choose Summarizer Mode", [
                                            'Extractive', 'Abstractive'])
+            model, tokenizer, device = NLP_summarization.setup_T5()
             # sort the review
             df_tmp = df_new.sort_values(by='review_date')[::-1].iloc[:reviewsNum]
             df_tmp = df_tmp[['review_name', 'review_date', 'review_text_raw', 'review_rating']]
             if st.button("Summarize"):
                 df_0 = text_summarization(
-                    df_tmp, summary_options)
+                    df_tmp, summary_options, model, tokenizer, device)
 
                 for ii in range(len(df_0)):
                     render_summary(df_0, ii, summary_options)

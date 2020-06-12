@@ -27,15 +27,17 @@ def clean_special_char(df, text_field):
     return df
 
 
-def abstractive_sum(review, num_beams=4, no_repeat_ngram_size=2,
-                    min_length=30,
-                    max_length=200,
-                    early_stopping=True):
-
+def setup_T5():
     model = T5ForConditionalGeneration.from_pretrained('t5-small')
     tokenizer = T5Tokenizer.from_pretrained('t5-small')
     device = torch.device('cpu')
+    return model, tokenizer, device
 
+def abstractive_sum(review, model, tokenizer, device,
+                    num_beams=4, no_repeat_ngram_size=2,
+                    min_length=30,
+                    max_length=200,
+                    early_stopping=True):
     preprocess_text = review.strip().replace("\n", "")
     t5_prepared_Text = "summarize: " + preprocess_text
     print("original text preprocessed: \n", preprocess_text)
