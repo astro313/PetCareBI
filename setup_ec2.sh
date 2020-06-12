@@ -34,6 +34,10 @@ cd ..
 rm OpenSSL_1_0_2l.tar.gz
 rm -rf openssl-OpenSSL_1_0_2l/
 
+sudo yum -y install docker
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+
 
 # Install Python 3.6
 wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz
