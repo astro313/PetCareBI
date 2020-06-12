@@ -118,7 +118,7 @@ def load_T5():
     return model, tokenizer, device
 
 
-def main(DATA_PATH=None):
+def main(DATA_PATH=None, debug=False):
 
     st.sidebar.title("About App")
     st.sidebar.text("PetCare BI with Streamlit")
@@ -151,10 +151,11 @@ def main(DATA_PATH=None):
     lda_model_label = load_labels_pretrained_LDA(MODEL_LABEL_PATH)
     dictionary, df_new = get_dictionary_from_df(df_new)
 
-    if st.checkbox("Show all reviews", False):
-        st.subheader("")
-        st.write(df_new[['biz_name', 'review_date',
-                         'review_rating', 'review_text_raw']])
+    if debug:
+        if st.checkbox("Show all reviews", False):
+            st.subheader("")
+            st.write(df_new[['biz_name', 'review_date',
+                             'review_rating', 'review_text_raw']])
 
     st.header("Select your business: ")
     biz_name = st.selectbox("Pick business name", biz_name_option)
@@ -261,6 +262,8 @@ def main(DATA_PATH=None):
             if st.button("Summarize"):
                 df_0 = text_summarization(
                     df_tmp, summary_options, model, tokenizer, device)
+                if debug:
+                    st.write(df_0)
 
                 for ii in range(len(df_0)):
                     render_summary(df_0, ii, summary_options)
@@ -276,4 +279,4 @@ def main(DATA_PATH=None):
 
 
 if __name__ == '__main__':
-    main(DATA_PATH)
+    main(DATA_PATH, debug=False)
