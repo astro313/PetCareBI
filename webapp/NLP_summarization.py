@@ -1,14 +1,9 @@
 # NLPf
-import re
-import string
-import pandas as pd
-from collections import defaultdict
-import spacy
 from nltk.corpus import stopwords
+from gensim.summarization import summarize
+import torch
+from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
 STOPWORDS = set(stopwords.words('english'))
-
-from gensim.summarization import summarize, keywords
-from pprint import pprint
 
 
 def extractive_sum(review, ratio=0.2):
@@ -36,9 +31,6 @@ def abstractive_sum(review, num_beams=4, no_repeat_ngram_size=2,
                     min_length=30,
                     max_length=200,
                     early_stopping=True):
-    import torch
-    import json
-    from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Config
 
     model = T5ForConditionalGeneration.from_pretrained('t5-small')
     tokenizer = T5Tokenizer.from_pretrained('t5-small')
