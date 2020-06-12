@@ -59,7 +59,7 @@ def plot_topic_distribution(df_dominant_topic_in_each_doc):
     return None
 
 
-def text_summarization(df, mode, model=None, device=None, tokenizer=None):
+def text_summarization(df, mode, model=None, tokenizer=None, device=None):
     if mode.lower() == 'extractive':
         df_0 = NLP_summarization.clean_special_char(df, 'review_text_raw')
         df_0['ex_summary'] = df_0['review_text_raw'].apply(
@@ -111,6 +111,11 @@ def get_dictionary_from_df(df_new):
         dictionary, _ = ldacomplaints.get_dict_and_corpus(
             df_new['review_text_lem_cleaned_tokenized_nostop'])
     return dictionary, df_new
+
+@st.cache
+def load_T5():
+    model, tokenizer, device = NLP_summarization.setup_T5()
+    return model, tokenizer, device
 
 
 def main(DATA_PATH=None):
@@ -249,7 +254,7 @@ def main(DATA_PATH=None):
                 label="Pick number of most recent reviews", min_value=1, max_value=len(df_new))
             summary_options = st.selectbox("Choose Summarizer Mode", [
                                            'Extractive', 'Abstractive'])
-            model, tokenizer, device = NLP_summarization.setup_T5()
+            model, tokenizer, device = load_T5()
             # sort the review
             df_tmp = df_new.sort_values(by='review_date')[::-1].iloc[:reviewsNum]
             df_tmp = df_tmp[['review_name', 'review_date', 'review_text_raw', 'review_rating']]
