@@ -2,9 +2,9 @@
 Your single platform that mimics human ability to comprehend reviews and generate insights, understandable by any business person.
 
 ## Motivation
-68% of US household owns a pet and the annual cash flow of the pet service industry is >$10B, which is projected to continue its growth in 2020 despite COVID-19. To help busniess owners to stand out from their competitors and promote customer retention in this lucrative industry, PetCare BI is here to help you increase your customer satistfaction score and lower the number of poor reviews. 
+68% of US household owns a pet and the annual cash flow of the pet service industry is >$10B, which is projected to continue its growth in 2020 despite COVID-19. To help business owners to stand out from their competitors and promote customer retention in this lucrative industry, PetCare BI is here to help you increase your customer satisfaction score and lower the number of poor reviews. 
 
-We understand that reviews are often overwhelming in length with information buried in unstructued text, written in different styles, and cover a few different aspects in a single review. PetCare BI is a business intelligence webapp with dashboard showing the key topics discussed in Yelp reviews, topic trends over the years, and for each review rating group. It also uses AI to provide executive summary to help you quickly gauge consumers’ feedback on the services. With PetCare BI, time spent on reading and understanding reviews are reduced by >50%! 
+We understand that reviews are often overwhelming in length with information buried in unstructured text, written in different styles, and cover a few different aspects in a single review. PetCare BI is a business intelligence webapp with dashboard showing the key topics discussed in Yelp reviews, topic trends over the years, and for each review rating group. It also uses AI to provide executive summary to help you quickly gauge consumers’ feedback on the services. With PetCare BI, time spent on reading and understanding reviews are reduced by >50%! 
 
 ### Based on these insights, business owners can:
     1. determine which aspects of the business is having bigger issues with customers. 
@@ -20,7 +20,7 @@ This project is divided into 6 modules.
 * **Part II: synthesize data, numerical and visual EDA**
     - Basic data management, combining files, removing duplicates, NA rows, etc
 * **Part III: NLP**
-    - URL, stopwords, keep nouns, lemmatizatioin, POS identification, etc
+    - URL, stopwords, keep nouns, lemmatization, POS identification, etc
 * **Part IV: LDA modeling**
     - hyperparmeter turning
     - validation
@@ -29,26 +29,23 @@ This project is divided into 6 modules.
     - Abstractive summary: AI-based (transformer model)
     - Extractive summary: frequency based (NLTK)
 * **Part VI: Front-end/Results** 
-    - Dcoker + streamlit + AWS 
+    - Docker + streamlit + AWS 
 
 
 ### Technical aspects
 PetCare BI is based on Latent Dirichlet Allocation (LDA) model and SOTA T5 transformer model. 
-- 123
-- 123
-- 123
 
 
 #### Note/challenges/edge cases:
-- Choosing right algo for the right job: LDA vs. embedding + clustering, etc.  
-    1. chose LDA becuase interested in thematic topics/clusters, not semantic & syntactic groupings (e.g., good reviews and great reviews). Clustering embedding yields the latter. 
+- Choosing right algorithm for the right job: LDA vs. embedding + clustering, etc.  
+    1. chose LDA because interested in thematic topics/clusters, not semantic & syntactic groupings (e.g., good reviews and great reviews). Clustering embedding yields the latter. 
     2. Not use NMF because large DS + topic probabilities unlikely fixed per review
 - Low coherence: many redundant words (useless feature vectors) → Went back to EDA, understand what does “topic” mean → Keeping only nouns + remove  customized words + understand & tuned hyperparameters (# of topics, alpha, beta)
 - Interesting insight from data : trend of day care/sitter w/ updates and photos
 - LDA doesn’t scale very well (training time for one epoch is proportional to scale of dataset). Luckily, number of topics doesn’t change that often -- don’t need to retrain model too frequently. 
 - Edge cases: in topic modeling, sometimes not very good at determining which is dominant topic in the review. → so we also provide text summary and aspect-based sentiment (todo).
 - ways to validate result.
-- Overall, understanding the algorithm and developing a heuristic approach to clean the data and perform NLP was key to getting good reuslts in topic modeling. 
+- Overall, understanding the algorithm and developing a heuristic approach to clean the data and perform NLP was key to getting good results in topic modeling. 
 
 
 #### To Launch webapp on EC2 using saved LDAmodel and dataset
@@ -69,7 +66,7 @@ if scrape data:
     2. scrape_biz_link_multipage.py
     3. scrape_reviews.py
     4. zipcode_based_drop_dupl_biz.py
-if create single pd dataframeframe w/ all reviews for creating new model:
+if create single pd dataframe w/ all reviews for creating new model:
 
     1. df = load_review_helper.combine_all_reviews_for_model()
     2. df_new = NLP_cleaning.apply_NLP_cleaning(df_new)
