@@ -2,9 +2,9 @@
 Your single platform that mimics human ability to comprehend reviews and generate insights, understandable by any business person.
 
 ## Motivation
-68% of US household owns a pet and the annual cash flow of the pet service industry is >$10B, which is projected to continue its growth in 2020 despite COVID-19. To help business owners to stand out from their competitors and promote customer retention in this lucrative industry, PetCare BI is here to help you increase your customer satisfaction score and lower the number of poor reviews. 
+68% of US household owns a pet and the annual cash flow of the pet service industry is >$10B, which is projected to continue its growth in 2020 despite COVID-19. To help business owners to stand out from their competitors and promote customer retention in this lucrative industry, PetCare BI is business intelligence tool built for increasing customer satisfaction score and reducing the number of poor reviews. 
 
-We understand that reviews are often overwhelming in length with information buried in unstructured text, written in different styles, and cover a few different aspects in a single review. PetCare BI is a business intelligence webapp with dashboard showing the key topics discussed in Yelp reviews, topic trends over the years, and for each review rating group. It also uses AI to provide executive summary to help you quickly gauge consumers’ feedback on the services. With PetCare BI, time spent on reading and understanding reviews are reduced by >50%! 
+Reviews are often overwhelming in length, with information buried in unstructured text, written in different styles, and cover different aspects in each. PetCare BI provides a dashboard showing the key topics discussed in Yelp reviews, topic trends over the years, and over each review rating group. It  uses AI to provide executive summary to help business owners quickly gauge consumers’ feedback on services. With PetCare BI, time spent on reading and understanding reviews can be reduced by >50%! 
 
 ### Based on these insights, business owners can:
     1. determine which aspects of the business is having bigger issues with customers. 
@@ -16,11 +16,11 @@ We understand that reviews are often overwhelming in length with information bur
 #### Project Aim:
 This project is divided into 6 modules.
 * **Part I: Web_scraping**
-    - Obtaining Yelp review for businesses in pet service industry. Specifically in pet kennels, hotels, day care. Scraped using selenium and beautifulsoup.
+    - Obtaining Yelp review for businesses in pet service industry. Specifically in pet kennels, hotels, grooming, and day care. Scraped using selenium and beautifulsoup.
 * **Part II: synthesize data, numerical and visual EDA**
     - Basic data management, combining files, removing duplicates, NA rows, etc
 * **Part III: NLP**
-    - URL, stopwords, keep nouns, lemmatization, POS identification, etc
+    - URL, numbers, stopwords, keep nouns, lemmatization, POS identification, etc
 * **Part IV: LDA modeling**
     - hyperparmeter turning
     - validation
