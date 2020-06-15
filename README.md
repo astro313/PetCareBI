@@ -48,7 +48,7 @@ PetCare BI is based on Latent Dirichlet Allocation (LDA) model and SOTA T5 trans
 - LDA doesn’t scale very well (training time for one epoch is proportional to scale of dataset). Luckily, number of topics doesn’t change that often -- don’t need to retrain model too frequently. 
 - Edge cases: in topic modeling, sometimes not very good at determining which is dominant topic in the review. → so we also provide text summary and aspect-based sentiment (todo).
 - ways to validate result.
---> Understanding the algorithm and developing a heurestic process to clean the data and perform NLP was key to getting good reuslts. 
+- Overall, understanding the algorithm and developing a heuristic approach to clean the data and perform NLP was key to getting good reuslts in topic modeling. 
 
 
 #### To Launch webapp on EC2 using saved LDAmodel and dataset
