@@ -82,6 +82,7 @@ def render_summary(df, ii, summary_options):
         summary_field = 'ab_summary'
     review_raw = df.iloc[ii]['review_text_raw']
     review_sum = df.iloc[ii][summary_field]
+    # print(review_sum)
     st.markdown('### Summarized Review \n\n')
     st.markdown(review_sum)
     st.markdown('#### Original Review \n')
@@ -251,8 +252,11 @@ def main(DATA_PATH=None, debug=False):
 
         if st.checkbox("Show executive summary on reviews (given selected review rating)"):
             # st.subheader("Summarize Your Text")
-            reviewsNum = st.number_input(
-                label="Pick number of most recent reviews", min_value=1, max_value=len(df_new))
+            if len(df_new) > 1:
+                reviewsNum = st.slider(
+                               label="Pick number of most recent reviews", min_value=1, max_value=len(df_new))
+            else:
+                reviewsNum = 1
             summary_options = st.selectbox("Choose Summarizer Mode", [
                                            'Extractive', 'Abstractive'])
             model, tokenizer, device = load_T5()
