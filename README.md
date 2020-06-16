@@ -1,5 +1,5 @@
 # PetCareBI
-Your single platform that mimics human ability to comprehend reviews and generate insights, understandable by any business person.
+A machine learning platform for extracting insights from customer reviews in the pet service industry. 
 
 ## Motivation
 68% of US household owns a pet and the annual cash flow of the pet service industry is >$10B, which is projected to continue its growth in 2020 despite COVID-19. To help business owners to stand out from their competitors and promote customer retention in this lucrative industry, PetCare BI is business intelligence tool built for increasing customer satisfaction score and reducing the number of poor reviews. 
@@ -12,6 +12,9 @@ Reviews are often overwhelming in length, with information buried in unstructure
     3. improve service based on customer reviews and incentivize "turned away" customers --> updated review to attract more customers.
     4. strategize their marketing effort or business model based on latest trends (e.g., providing updates on pets in day care/boarding service).
 
+
+### Example 
+- add screenshot (todo)
 
 #### Project Aim:
 This project is divided into 6 modules.
