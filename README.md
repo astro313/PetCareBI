@@ -14,7 +14,8 @@ Reviews are often overwhelming in length, with information buried in unstructure
 
 
 ### Example 
-- add screenshot (todo)
+![](demo/rating.png)
+![](demo/pie.png)
 
 #### Project Aim:
 This project is divided into 6 modules.
