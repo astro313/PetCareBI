@@ -92,6 +92,7 @@ def render_summary(df, ii, summary_options):
 @st.cache(allow_output_mutation=True)
 def load_data(DATA_PATH):
     df_new = pd.read_csv(DATA_PATH)
+    df_new = df_new.drop_duplicates('review_text_raw')
     return df_new
 
 
@@ -161,6 +162,7 @@ def main(DATA_PATH=None, debug=False):
     st.header("Select your business: ")
     biz_name = st.selectbox("Pick business name", biz_name_option)
     df_new = get_review_single_biz(df_new, biz_name)
+    df_new.drop_duplicates(['review_text_raw'], inplace=True)
 
     # # plot review distribution
     review_pd = df_new.groupby('review_rating').count()[
