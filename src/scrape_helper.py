@@ -8,6 +8,19 @@ import os, glob
 import subprocess
 
 def file_len(fname):
+    """
+
+    calc the number of rows in fnamme
+
+    Parameters
+    ----------
+    fname: str
+
+    Returns
+    -------
+    int
+
+    """
     p = subprocess.Popen(['wc', '-l', fname], stdout=subprocess.PIPE,
                                               stderr=subprocess.PIPE)
     result, err = p.communicate()
