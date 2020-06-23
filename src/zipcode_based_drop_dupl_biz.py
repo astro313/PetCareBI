@@ -14,6 +14,29 @@ import os
 
 
 def remove_dupl_biz(cities, out_path, columns, catnum=5):
+    """
+
+    Remove duplciated rows
+
+    Parameters
+    ----------
+    cities: list
+        list of integers containinig zipcodes
+
+    out_path: str
+        path to output .csv
+
+    columns: list
+        list of str, containing the names of the columnes
+
+    catnum: int
+
+
+    Returns
+    -------
+    None
+
+    """
     for zipc in cities:
         zipc = str(zipc)
         # find files for reviews of a given zip code
