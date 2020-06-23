@@ -1,3 +1,8 @@
+"""
+
+Scrape all reviews by going to each URL in the input files.
+
+"""
 
 import os
 import random
@@ -29,6 +34,10 @@ def setOptions():
 
 
 def getNextPage(driver, wait):
+    """
+    iterate page
+
+    """
     nextURL = driver.find_element_by_xpath(
         "//a[@class='u-decoration-none next pagination-links_anchor']").get_attribute('href')
     soup = finishLoadGrabSource(nextURL, driver, wait)
@@ -36,6 +45,11 @@ def getNextPage(driver, wait):
 
 
 def finishLoadGrabSource(url, driver, wait):
+    """
+
+    grab source code to webpage
+
+    """
 
     loadingCondition = EC.invisibility_of_element_located(
         (By.CLASS_NAME, 'throbber'))
@@ -67,6 +81,21 @@ def quitDriver(driver):
 
 
 def startThread(desc, city):
+    """
+    main code to run the scraper
+
+    Parameters
+    ----------
+    desc: str
+
+    city: str
+
+    Returns
+    -------
+    listOverall: list containing all the reviews of this given city and desc
+
+
+    """
 
 #     filepath = glob.glob('scraped_data/' + city + '_businesses_v*.csv')
     filepath = glob.glob('scraped_data/' + city + '_' + desc + '_v*.csv')
