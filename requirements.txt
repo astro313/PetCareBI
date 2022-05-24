@@ -5,7 +5,7 @@ scipy==1.4.1
 gensim==3.8.3
 nltk==3.5
 pyLDAvis
-tensorflow==1.13.2
+tensorflow==2.6.4
 pandas==0.24.2
 torchvision
 transformers==2.11.0
